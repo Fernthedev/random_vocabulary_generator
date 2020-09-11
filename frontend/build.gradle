@@ -1,0 +1,54 @@
+plugins {
+    id "com.github.node-gradle.node" version "2.2.4"
+}
+apply plugin: 'base'
+
+task start(type: YarnTask) {
+    inputs.file("package-lock.json").withPathSensitivity(PathSensitivity.RELATIVE)
+
+    args = ["start"]
+
+//    commandLine "yarn", 'start'
+//    inputs.file("webpack.config.js").withPathSensitivity(PathSensitivity.RELATIVE)
+//    commandLine "./node_modules/.bin/webpack-dev-server", '--mode', 'development', '--devtool', 'inline-source-map', '--hot'
+}
+
+task npm_install(type: YarnTask) {
+//    commandLine "yarn", 'install'
+
+    args ['install']
+
+//    standardOutput = new FileOutputStream("./install.txt")
+}
+
+//task test(type: Exec) {
+task test(type: YarnTask) {
+//    commandLine "yarn", 'test'
+    args = ['test']
+
+//    standardOutput = new FileOutputStream("./out.txt")
+}
+
+// webpack task
+//task webpack(type: Exec) {
+task webpack(type: YarnTask) {
+    args = ['build']
+
+//    inputs.file("package-lock.json").withPathSensitivity(PathSensitivity.RELATIVE)
+//    inputs.file("yarn.lock").withPathSensitivity(PathSensitivity.RELATIVE)
+//    inputs.file("webpack.config.js").withPathSensitivity(PathSensitivity.RELATIVE)
+//    outputs.cacheIf { true }
+//    commandLine "yarn", "build"
+
+//    commandLine "./node_modules/.bin/webpack-cli", '--mode', 'production'
+
+
+}
+
+clean {
+    delete 'build'
+}
+
+//check.dependsOn(test)
+assemble.dependsOn(npm_install)
+assemble.dependsOn(webpack)

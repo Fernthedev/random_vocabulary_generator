@@ -1,0 +1,85 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'org.asciidoctor.convert' version '1.5.8'
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'org.jetbrains.kotlin.kapt' version '1.4.10'
+}
+apply plugin: 'kotlin'
+
+group = 'com.github.fernthedev'
+version = '1.0.0'
+sourceCompatibility = targetCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+    implementation 'com.github.Fernthedev:fern-configmanager:1.3.0' // Check github releases tag for the version.
+
+    kapt "org.springframework.boot:spring-boot-configuration-processor"
+
+    implementation("com.squareup.okhttp3:okhttp:4.8.1")
+
+    implementation 'com.github.Fernthedev:FernUtils:1.4.1'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    dependsOn test
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+bootJar {
+    archivesBaseName = 'random-vocab-generator'
+    mainClassName = 'com.github.fernthedev.random_vocab.RandomVocabApplication'
+
+    from('../frontend/build') {
+        into 'static'
+    }
+}
+
+bootJar.dependsOn(':frontend:assemble')
